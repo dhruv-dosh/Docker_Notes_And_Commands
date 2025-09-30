@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------
+  # SERVICE 1: MySQL Database
+  # ----------------------------------------------------------
+  mysql_db:
+    image: mysql:8.0
+    container_name: collaboratespace_mysql
+    restart: always
+    environment:
+      # Database name for your project, as specified: CollaborateSpace_db
+      MYSQL_DATABASE: CollaborateSpace_db
+      # User credentials (change these for production!)
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      # Root password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      # Map internal MySQL port to an external port (optional, but useful for Workbench/IDE)
+      - "3306:3306"
+    volumes:
+      # Persistent storage for the database data
+      - db_data:/var/lib/mysql
+
+  # ----------------------------------------------------------
+  # SERVICE 2: Spring Boot Backend
+  # ----------------------------------------------------------
+  backend:
+    build:
+      context: ./backend  # Path to the backend folder containing the Dockerfile
+      dockerfile: Dockerfile
+    container_name: collaboratespace_backend
+    depends_on:
+      - mysql_db           # Ensure database starts before the backend
+    restart: always
+    environment:
+      # Configure Spring Boot to connect to the MySQL service via its service name
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/CollaborateSpace_db?allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      # Set the backend application port (5054)
+      SERVER_PORT: 5054
+    ports:
+      # Map internal port 5054 to external port 5054
+      - "5054:5054"
+
+  # ----------------------------------------------------------
+  # SERVICE 3: React Frontend (Nginx)
+  # ----------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend # Path to the frontend folder containing the Dockerfile
+      dockerfile: Dockerfile
+    container_name: collaboratespace_frontend
+    depends_on:
+      - backend            # Frontend depends on the backend API
+    restart: always
+    ports:
+      # Map internal port 5173 to external port 5173
+      - "5173:5173"
+
+# Define the persistent volume for the database data
+volumes:
+  db_data:
