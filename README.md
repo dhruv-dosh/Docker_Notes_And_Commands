@@ -1,4 +1,7 @@
-## 🐳 Docker Command Cheat Sheet (Notes)
+# 🐳 Docker Command Cheat Sheet (Notes)
+
+## Introduction
+This repository is designed as a learning resource and reference for Docker. It collects practical examples, notes, and commands covering core Docker concepts and tooling. Whether you are new to containers or seeking a refresher, this repo will help you understand how Docker works in real-world workflows.
 
 This document serves as a quick reference guide for essential Docker and Docker Compose commands, categorized by function.
 
